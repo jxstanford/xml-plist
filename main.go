@@ -7,11 +7,10 @@ import (
 )
 
 type PlistArray struct {
-	val []int  `xml:"integer"`
+	Integer []int  `xml:"integer"`
 }
 
-// const in = "<key>KEY1</key><string>VALUE OF KEY1</string><key>KEY2</key><string>VALUE OF KEY2</string><key>KEY3</key><integer>42</integer><key>KEY3</key><array><integer>1</integer><integer>2</integer></array>"
-const in = "<key>KEY1</key><string>VALUE OF KEY1</string><key>KEY2</key><string>VALUE OF KEY2</string><key>KEY3</key><integer>42</integer>"
+const in = "<key>KEY1</key><string>VALUE OF KEY1</string><key>KEY2</key><string>VALUE OF KEY2</string><key>KEY3</key><integer>42</integer><key>KEY3</key><array><integer>1</integer><integer>2</integer></array>"
 
 func main() {
 	result := map[string]interface{}{}
@@ -30,27 +29,33 @@ func main() {
 			switch start.Name.Local {
 			case "key":
 				var k string
-				dec.DecodeElement(&k, &start)
+				err := dec.DecodeElement(&k, &start)
+				if err != nil {
+					fmt.Println(err.Error())
+				}
 				workingKey = k
 			case "string":
 				var s string
 				err := dec.DecodeElement(&s, &start)
 				if err != nil {
-					fmt.Println(err)
+					fmt.Println(err.Error())
 				}
 				result[workingKey] = s
-				fmt.Printf("adding %s:%s to result\n", workingKey, s)
 				workingKey = ""
 			case "integer":
 				var i int
-				dec.DecodeElement(&i, &start)
-				fmt.Printf("adding %s:%d to result\n", workingKey, i)
+				err := dec.DecodeElement(&i, &start)
+				if err != nil {
+					fmt.Println(err.Error())
+				}
 				result[workingKey] = i
 				workingKey = ""
 			case "array":
 				var ai PlistArray
-				dec.DecodeElement(&ai, &start)
-				fmt.Printf("adding %s:%v to result\n", workingKey, ai)
+				err := dec.DecodeElement(&ai, &start)
+				if err != nil {
+					fmt.Println(err.Error())
+				}
 				result[workingKey] = ai
 				workingKey = ""
 			default:
